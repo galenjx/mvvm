@@ -62,24 +62,32 @@ Compile.prototype = {
             }
         });
     },
-    // $compile 6-1=========
+    // $compile 7-1=========
     compile: function(node) {
+        //获取所有属性
         var nodeAttrs = node.attributes,
+        //保存对象compile
             me = this;
-
         [].slice.call(nodeAttrs).forEach(function(attr) {
+            //v-on:click
             var attrName = attr.name;
+            //判断是不是指令v-
             if (me.isDirective(attrName)) {
+                //拿到指令表达式hide，msg...
                 var exp = attr.value;
+                //去掉v-
                 var dir = attrName.substring(2);
-                // 事件指令
+                // 事件指令有on
                 if (me.isEventDirective(dir)) {
+                      // $compile 7-1-1=========
                     compileUtil.eventHandler(node, me.$vm, exp, dir);
-                    // 普通指令
+                // 普通指令
                 } else {
+                    // $compile 7-2-1=========
+                    //对应指令找对应的方法去处理方法     dir：text exp：msg
                     compileUtil[dir] && compileUtil[dir](node, me.$vm, exp);
                 }
-
+                //移除指令属性
                 node.removeAttribute(attrName);
             }
         });
@@ -110,6 +118,7 @@ Compile.prototype = {
 // $compile 6-3=========
 // 解析指令处理对象 有v-text v-html v-class v-model 主要由bind去工作
 var compileUtil = {
+    // $compile 7-2-2=========找到的相应指令的处理函数
     text: function(node, vm, exp) {
         this.bind(node, vm, exp, 'text');
     },
@@ -141,6 +150,7 @@ var compileUtil = {
     // $compile 6-4=========
     bind: function(node, vm, exp, dir) {
         //得到更新节点的函数，在updater
+        // $compile 7-2-3=========真实的处理函数
         var updaterFn = updater[dir + 'Updater'];
         //调用函数更新节点
         updaterFn && updaterFn(node, this._getVMVal(vm, exp));
@@ -151,11 +161,15 @@ var compileUtil = {
     },
 
     // 事件处理
+    // $compile 7-1-1=========
     eventHandler: function(node, vm, exp, dir) {
+        //处理出事件名click
         var eventType = dir.split(':')[1],
+        //拿到事件处理函数methods下面找
             fn = vm.$options.methods && vm.$options.methods[exp];
 
         if (eventType && fn) {
+            //有时间名，有处理函数，给元素绑定事件，bind强制绑定this为vm
             node.addEventListener(eventType, fn.bind(vm), false);
         }
     },
