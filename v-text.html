@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MVVM</title>
+</head>
+<body>
+
+<div id="mvvm-app">
+    <p v-text="someStr"></p>
+    <!-- <button v-on:click="clickBtn">change model</button> -->
+</div>
+
+<!-- <script src="http://cdn.bootcss.com/vue/1.0.25/vue.js"></script> -->
+<script src="./js/observer.js"></script>
+<script src="./js/watcher.js"></script>
+<script src="./js/compile.js"></script>
+<script src="./js/mvvm.js"></script>
+<script>
+    var vm = new MVVM({
+        el: '#mvvm-app',
+        data: {
+            someStr: 'hello ',
+        },
+        // methods: {
+        //     clickBtn: function(e) {
+        //         this.someStr = "word";
+        //     }
+        // }
+    });
+
+    // vm.$watch('child.someStr', function() {
+    //     console.log(arguments);
+    // });
+</script>
+
+</body>
+</html>

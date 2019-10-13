@@ -13,7 +13,7 @@ function MVVM(options) {
     });
 
     this._initComputed();
-
+    //observe======1对data中所有层次的属性通过数据劫持实现数据绑定
     observe(data, this);
 
     //$compile 1=========创建一个编译对象，编译和解析模板，传递了el与vm

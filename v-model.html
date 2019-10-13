@@ -7,14 +7,8 @@
 <body>
 
 <div id="mvvm-app">
-    <input type="text" v-model="someStr">
     <input type="text" v-model="child.someStr">
-    <!-- <p v-class="className" class="abc">
-        {{someStr}}
-        <span v-text="child.someStr"></span>
-    </p> -->
-    <p>{{ getHelloWord }}</p>
-    <p v-html="htmlStr"></p>
+    <p>{{ child.someStr }}</p>
     <button v-on:click="clickBtn">change model</button>
 </div>
 
@@ -34,13 +28,6 @@
                 someStr: 'World !'
             }
         },
-
-        computed: {
-            getHelloWord: function() {
-                return this.someStr + this.child.someStr;
-            }
-        },
-
         methods: {
             clickBtn: function(e) {
                 var randomStrArr = ['childOne', 'childTwo', 'childThree'];

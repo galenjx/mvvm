@@ -1,16 +1,18 @@
-function Watcher(vm, expOrFn, cb) {
-    this.cb = cb;
+function Watcher(vm, exp, cb) {
+    this.cb = cb;//更新界面的回调
     this.vm = vm;
-    this.expOrFn = expOrFn;
-    this.depIds = {};
+    this.exp = exp;//表达式
+    // this.expOrFn = expOrFn;//表达式
+    this.depIds = {};//相关的dep容器对象
+    this.value = this.get();//表达式的初始值
 
-    if (typeof expOrFn === 'function') {
-        this.getter = expOrFn;
-    } else {
-        this.getter = this.parseGetter(expOrFn.trim());
-    }
+    // if (typeof expOrFn === 'function') {
+    //     this.getter = expOrFn;
+    // } else {
+    //     this.getter = this.parseGetter(expOrFn.trim());
+    // }
 
-    this.value = this.get();
+    // this.value = this.get();//表达式的初始值
 }
 
 Watcher.prototype = {
@@ -23,6 +25,7 @@ Watcher.prototype = {
         var oldVal = this.value;
         if (value !== oldVal) {
             this.value = value;
+            //使用回调函数更新数据
             this.cb.call(this.vm, value, oldVal);
         }
     },
@@ -41,29 +44,54 @@ Watcher.prototype = {
         // 这一步是在 this.get() --> this.getVMVal() 里面完成，forEach时会从父级开始取值，间接调用了它的getter
         // 触发了addDep(), 在整个forEach过程，当前wacher都会加入到每个父级过程属性的dep
         // 例如：当前watcher的是'child.child.name', 那么child, child.child, child.child.name这三个属性的dep都会加入当前watcher
+        
+
+        //判断dep与watcher的关系是否已经建立
         if (!this.depIds.hasOwnProperty(dep.id)) {
+
+            //将watcher添加到dep中去，dep-->为了用于更新
             dep.addSub(this);
+            //防止重复建立关系（涉及到用标识去取值，用对象存）
             this.depIds[dep.id] = dep;
         }
     },
+    //
     get: function() {
         Dep.target = this;
-        var value = this.getter.call(this.vm, this.vm);
+        // var value = this.getter.call(this.vm, this.vm);
+        //获取表达式的值，内部会调用get，建立dep与watcher的关系
+        var value = this.getVMVal();
+        //去除dep中指定watcher
         Dep.target = null;
         return value;
     },
 
-    parseGetter: function(exp) {
-        if (/[^\w.$]/.test(exp)) return; 
 
-        var exps = exp.split('.');
 
-        return function(obj) {
-            for (var i = 0, len = exps.length; i < len; i++) {
-                if (!obj) return;
-                obj = obj[exps[i]];
-            }
-            return obj;
-        }
-    }
+    //从vm得到表达式对应的值
+    getVMVal: function() {
+        var exp = this.exp.split('.')
+        var val = this.vm._data
+        exp.forEach(function(k) {
+            val = val[k];
+        });
+        return val;
+    },
+
+
+
+
+    // parseGetter: function(exp) {
+    //     if (/[^\w.$]/.test(exp)) return; 
+
+    //     var exps = exp.split('.');
+
+    //     return function(obj) {
+    //         for (var i = 0, len = exps.length; i < len; i++) {
+    //             if (!obj) return;
+    //             obj = obj[exps[i]];
+    //         }
+    //         return obj;
+    //     }
+    // }
 };

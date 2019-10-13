@@ -128,16 +128,19 @@ var compileUtil = {
     },
 
     model: function(node, vm, exp) {
+        // 初始化显示并创建一个watcher
         this.bind(node, vm, exp, 'model');
-
         var me = this,
+        // 得到表达式的值
             val = this._getVMVal(vm, exp);
+            // 给当前的节点绑定input事件，内容变化即触发
         node.addEventListener('input', function(e) {
+            //输入框的值
             var newValue = e.target.value;
             if (val === newValue) {
                 return;
             }
-
+            //给相应的属性设置相应的值——>对应的set——>dep——>watcher——>更新视图
             me._setVMVal(vm, exp, newValue);
             val = newValue;
         });
@@ -155,6 +158,7 @@ var compileUtil = {
         //调用函数更新节点
         updaterFn && updaterFn(node, this._getVMVal(vm, exp));
 
+        //为表达式创建一个对应的watcher，实现节点更新显示，表达式更新时回调函数执行更新
         new Watcher(vm, exp, function(value, oldValue) {
             updaterFn && updaterFn(node, value, oldValue);
         });
